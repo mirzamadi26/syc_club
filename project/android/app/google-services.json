@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1073864036472",
+    "project_id": "syc-club",
+    "storage_bucket": "syc-club.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1073864036472:android:074f326d5f27e6856f9d8d",
+        "android_client_info": {
+          "package_name": "com.example.project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1073864036472-54ao72gs5i4tfeibrh85bgsofdvnsm3e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCeafZ59IjU53tgWLwtB0GtkpEUj1E3ENM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1073864036472-54ao72gs5i4tfeibrh85bgsofdvnsm3e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
