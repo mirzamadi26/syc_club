@@ -31,7 +31,7 @@ class _HomeControllerState extends State<HomeController> {
               ))
         ],
       ),
-      drawer: DrawerNavigation(),
+      // drawer: DrawerNavigation(),
     );
   }
 }

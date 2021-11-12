@@ -1,9 +1,34 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:project/Home/drawernavigation.dart';
 import 'package:project/Home/homescreen.dart';
 
-class MyProfile extends StatelessWidget {
+class MyProfile extends StatefulWidget {
   const MyProfile({Key? key}) : super(key: key);
+
+  @override
+  State<MyProfile> createState() => _MyProfileState();
+}
+
+class _MyProfileState extends State<MyProfile> {
+  String? user;
+  List syc = [];
+
+  getEmail() {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    setState(() {
+      user = auth.currentUser!.email;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getEmail();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,8 +37,24 @@ class MyProfile extends StatelessWidget {
         appBar: AppBar(
           iconTheme: IconThemeData(color: Colors.black),
           backgroundColor: Colors.white,
-          title: Text("Hi, Hassan Yousuf",
-              style: TextStyle(color: Colors.black87, fontSize: 16)),
+          title: StreamBuilder<QuerySnapshot>(
+              stream:
+                  FirebaseFirestore.instance.collection('users').snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  snapshot.data!.docs.forEach((element) {
+                    if (element['email'] == user) {
+                      syc.add(element.data());
+                    }
+                  });
+                  return Text("Hi, ${syc[0]['firstname']}",
+                      style: GoogleFonts.montserratAlternates(
+                          color: Colors.black87, fontSize: 16));
+                }
+                return CircularProgressIndicator(
+                  color: Colors.black,
+                );
+              }),
           actions: [
             TextButton.icon(
                 onPressed: () {
@@ -27,139 +68,342 @@ class MyProfile extends StatelessWidget {
                 ),
                 label: Text(
                   "Back",
-                  style: TextStyle(color: Colors.black),
+                  style: GoogleFonts.montserratAlternates(
+                    color: Colors.black,
+                    fontSize: 13,
+                  ),
                 ))
           ],
         ),
         drawer: DrawerNavigation(),
-        body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          SizedBox(
-            height: 20,
-          ),
-          Text("Your Profile"),
-          Stack(children: [
-            Container(
-              width: double.infinity,
-              height: 230,
-              decoration: BoxDecoration(
-                color: Colors.white,
-              ),
-            ),
-            Center(
-              child: Container(
-                margin: EdgeInsets.only(top: 30),
-                width: 320,
-                height: 160,
-                decoration: BoxDecoration(
-                    border: Border.all(width: 2.5, color: Colors.black),
-                    borderRadius: BorderRadius.circular(40),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 2,
-                        spreadRadius: 2,
-                        offset: Offset(3, 4),
-                      )
-                    ]),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                Text("Hassan Yousuf"),
-                                SizedBox(
-                                  height: 20,
+        body: SingleChildScrollView(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('users').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                snapshot.data!.docs.forEach((element) {
+                  if (element['email'] == user) {
+                    syc.add(element.data());
+                  }
+                });
+                return Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        "Your Profile",
+                        style: GoogleFonts.montserratAlternates(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      Stack(children: [
+                        Container(
+                          width: double.infinity,
+                          height: 230,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                          ),
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 30),
+                            width: MediaQuery.of(context).size.width * 0.75,
+                            height: MediaQuery.of(context).size.height * 0.20,
+                            decoration: BoxDecoration(
+                                border:
+                                    Border.all(width: 2.5, color: Colors.black),
+                                borderRadius: BorderRadius.circular(40),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 2,
+                                    spreadRadius: 2,
+                                    offset: Offset(3, 4),
+                                  )
+                                ]),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.all(18.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                syc[0]['firstname'],
+                                                style: GoogleFonts
+                                                    .montserratAlternates(
+                                                  color: Colors.black,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                              Text(
+                                                " ${syc[0]['lastname']}",
+                                                style: GoogleFonts
+                                                    .montserratAlternates(
+                                                  color: Colors.black,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 20,
+                                          ),
+                                          Text(
+                                            syc[0]['mobileno'],
+                                            style: GoogleFonts
+                                                .montserratAlternates(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 20,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: 140,
+                                                child: Text(
+                                                  syc[0]['email'],
+                                                  style: GoogleFonts
+                                                      .montserratAlternates(
+                                                    color: Colors.black,
+                                                    fontSize: 13,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        ]),
+                                        Padding(
+                                          padding: const EdgeInsets.all(18.0),
+                                          child: CircleAvatar(
+                                            radius: 35,
+                                            backgroundColor: Colors.white,
+                                            backgroundImage: AssetImage(
+                                                "assets/profile.png"),
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  ],
                                 ),
-                                Text("0336XXXXXX"),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Text("example@gmail.com"),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(18.0),
-                              child: CircleAvatar(
-                                radius: 35,
-                                backgroundColor: Colors.white,
-                                backgroundImage:
-                                    AssetImage("assets/profile.png"),
                               ),
-                            )
+                            ),
+                          ),
+                        ),
+                      ]),
+                      SizedBox(height: 20),
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 130.0),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Height",
+                                        style: GoogleFonts.montserratAlternates(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      SizedBox(width: 80),
+                                      Text(
+                                        syc[0]['height'],
+                                        style: GoogleFonts.montserratAlternates(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 130),
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Gender",
+                                      style: GoogleFonts.montserratAlternates(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    SizedBox(width: 80),
+                                    Text(
+                                      syc[0]['gender'],
+                                      style: GoogleFonts.montserratAlternates(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    )
+                                  ]),
+                            ),
+                            SizedBox(height: 20),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 130.0),
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "City",
+                                      style: GoogleFonts.montserratAlternates(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    SizedBox(width: 80),
+                                    Text(
+                                      syc[0]['city'],
+                                      style: GoogleFonts.montserratAlternates(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    )
+                                  ]),
+                            ),
+                            SizedBox(height: 20),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 130),
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Status",
+                                      style: GoogleFonts.montserratAlternates(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    SizedBox(width: 80),
+                                    Text(
+                                      syc[0]['status'],
+                                      style: GoogleFonts.montserratAlternates(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    )
+                                  ]),
+                            ),
+                            SizedBox(height: 20),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 130),
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Religious",
+                                      style: GoogleFonts.montserratAlternates(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    SizedBox(width: 80),
+                                    Text(
+                                      syc[0]['religious'],
+                                      style: GoogleFonts.montserratAlternates(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    )
+                                  ]),
+                            ),
+                            SizedBox(height: 20),
+                            Center(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 130),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            "Income",
+                                            style: GoogleFonts
+                                                .montserratAlternates(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                            ),
+                                          )),
+                                      SizedBox(width: 80),
+                                      Text(
+                                        syc[0]['income'],
+                                        style: GoogleFonts.montserratAlternates(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 130),
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          "Children",
+                                          style:
+                                              GoogleFonts.montserratAlternates(
+                                            color: Colors.black,
+                                            fontSize: 14,
+                                          ),
+                                        )),
+                                    SizedBox(width: 80),
+                                    Text(
+                                      syc[0]['doyouhavechildren'],
+                                      style: GoogleFonts.montserratAlternates(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    )
+                                  ]),
+                            ),
                           ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ]),
-          SizedBox(height: 20),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Height"),
-                        SizedBox(width: 80),
-                        Text("5.5")
-                      ]),
-                ),
-                SizedBox(height: 20),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text("   Gender"),
-                  SizedBox(width: 80),
-                  Text("Male")
-                ]),
-                SizedBox(height: 20),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text("      Live in"),
-                  SizedBox(width: 80),
-                  Text("Lahore")
-                ]),
-                SizedBox(height: 20),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text("    Status"),
-                  SizedBox(width: 80),
-                  Text("Single")
-                ]),
-                SizedBox(height: 20),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text("    Religious"),
-                  SizedBox(width: 80),
-                  Text("Islam")
-                ]),
-                SizedBox(height: 20),
-                Center(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("          Income"),
-                        SizedBox(width: 80),
-                        Text("Rs 50000")
-                      ]),
-                ),
-                SizedBox(height: 20),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text(" Children"),
-                  SizedBox(width: 80),
-                  Text("No")
-                ]),
-              ],
-            ),
-          )
-        ]));
+                        ),
+                      )
+                    ]);
+              }
+              return CircularProgressIndicator();
+            },
+          ),
+        ));
   }
 }

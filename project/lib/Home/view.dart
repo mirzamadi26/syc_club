@@ -1,16 +1,46 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:project/Home/drawernavigation.dart';
+import 'package:project/Home/homescreen.dart';
 
 class View extends StatefulWidget {
-  View({Key? key}) : super(key: key);
+  View(
+      {Key? key,
+      required this.firstname,
+      required this.lastname,
+      required this.age,
+      required this.city,
+      required this.country,
+      required this.gender,
+      required this.status})
+      : super(key: key);
+  String firstname, lastname, age, city, country, gender, status;
 
   @override
   _ViewState createState() => _ViewState();
 }
 
 class _ViewState extends State<View> {
+  String? user;
+  List<dynamic> syc = [];
+
+  getEmail() {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    setState(() {
+      user = auth.currentUser!.email;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getEmail();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,11 +48,32 @@ class _ViewState extends State<View> {
         appBar: AppBar(
           iconTheme: IconThemeData(color: Colors.black),
           backgroundColor: Colors.white,
-          title: Text("Hi, Hassan Yousuf",
-              style: TextStyle(color: Colors.black87, fontSize: 16)),
+          title: StreamBuilder<QuerySnapshot>(
+              stream:
+                  FirebaseFirestore.instance.collection('users').snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  snapshot.data!.docs.forEach((element) {
+                    if (element['email'] == user) {
+                      syc.add(element.data());
+                    }
+                  });
+                  return Text("Hi, ${syc[0]['firstname']}",
+                      style: GoogleFonts.montserratAlternates(
+                          color: Colors.black87, fontSize: 16));
+                }
+                return CircularProgressIndicator(
+                  color: Colors.black,
+                );
+              }),
           actions: [
             TextButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                      (route) => false);
+                },
                 icon: Icon(
                   Icons.arrow_back,
                   color: Colors.black,
@@ -30,7 +81,10 @@ class _ViewState extends State<View> {
                 ),
                 label: Text(
                   "Back",
-                  style: TextStyle(color: Colors.black),
+                  style: GoogleFonts.montserratAlternates(
+                    color: Colors.black,
+                    fontSize: 13,
+                  ),
                 ))
           ],
         ),
@@ -41,9 +95,8 @@ class _ViewState extends State<View> {
           ),
           Text(
             "View",
-            style: TextStyle(
-              fontSize: 18,
-            ),
+            style: GoogleFonts.montserratAlternates(
+                color: Colors.black, fontSize: 20, fontWeight: FontWeight.w600),
           ),
           Stack(children: [
             Container(
@@ -59,8 +112,8 @@ class _ViewState extends State<View> {
             Center(
               child: Container(
                 margin: EdgeInsets.only(top: 30),
-                width: 320,
-                height: 160,
+                width: MediaQuery.of(context).size.width * 0.75,
+                height: MediaQuery.of(context).size.height * 0.20,
                 decoration: BoxDecoration(
                     border: Border.all(width: 2.5, color: Colors.black),
                     borderRadius: BorderRadius.circular(40),
@@ -85,11 +138,47 @@ class _ViewState extends State<View> {
                           children: [
                             Column(
                               children: [
-                                Text("Hassan Yousuf"),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      widget.firstname,
+                                      style: GoogleFonts.montserratAlternates(
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    Text(
+                                      " ${widget.lastname}",
+                                      style: GoogleFonts.montserratAlternates(
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                      ),
+                                    )
+                                  ],
+                                ),
                                 SizedBox(height: 10),
-                                Text("26, Karachi, Pakistan"),
-                                Text("Male,Single"),
-                                Text("Lahore"),
+                                Text(
+                                  "${widget.age}, ${widget.city}, ${widget.country}",
+                                  style: GoogleFonts.montserratAlternates(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                Text(
+                                  widget.gender,
+                                  style: GoogleFonts.montserratAlternates(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                Text(
+                                  widget.status,
+                                  style: GoogleFonts.montserratAlternates(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                  ),
+                                ),
                               ],
                             ),
                             Padding(
