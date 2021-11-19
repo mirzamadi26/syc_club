@@ -10,8 +10,10 @@ import 'package:project/Home/findyourmatch.dart';
 import 'package:project/Home/view.dart';
 import 'package:project/authentication/auth_home.dart';
 import 'package:project/authentication/login.dart';
+import 'package:project/chat/chatScreen.dart';
+
 import 'package:project/database/authservice.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:project/database/databasemanager.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> religious = [];
   List<String> firstname = [];
   List<String> lastname = [];
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
   List<String> city = [];
   List<String> country = [];
@@ -36,7 +39,19 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> status = [];
   List<String> email = [];
   List syc = [];
+  List chatSaved = [];
+  List listUserMap = [];
+  Map<String, dynamic>? userMap;
   String? user;
+  String chatRoomId(String user1, String user2) {
+    if (user1[0].toLowerCase().codeUnits[0] >
+        user2.toLowerCase().codeUnits[0]) {
+      return "$user1$user2";
+    } else {
+      return "$user2$user1";
+    }
+  }
+
   getEmail() {
     FirebaseAuth auth = FirebaseAuth.instance;
     final result = auth.currentUser!.email;
@@ -45,15 +60,27 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  getChat() async {
+    final result = await SYC.getchatemails(user!);
+    setState(() {
+      chatSaved = result;
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getEmail();
+    getChat();
   }
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    double mheight = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double text = MediaQuery.textScaleFactorOf(context);
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.black),
@@ -130,9 +157,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Center(
                         child: Container(
-                          margin: EdgeInsets.only(top: 30),
-                          width: MediaQuery.of(context).size.width * 0.75,
-                          height: MediaQuery.of(context).size.height * 0.20,
+                          margin: EdgeInsets.only(top: width / 16),
+                          width: width / 1.3,
+                          height: mheight / 4.3,
                           decoration: BoxDecoration(
                               border:
                                   Border.all(width: 2.5, color: Colors.black),
@@ -167,25 +194,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   style: GoogleFonts
                                                       .montserratAlternates(
                                                           color: Colors.black87,
-                                                          fontSize: 17,
+                                                          fontSize: text * 14,
                                                           fontWeight:
                                                               FontWeight.bold)),
                                               Text(" ${syc[0]['lastname']}",
                                                   style: GoogleFonts
                                                       .montserratAlternates(
                                                           color: Colors.black87,
-                                                          fontSize: 17,
+                                                          fontSize: text * 14,
                                                           fontWeight:
                                                               FontWeight.bold)),
                                             ],
                                           ),
-                                          SizedBox(height: 10),
+                                          SizedBox(height: mheight / 40),
                                           Text(
                                             syc[0]['gender'],
                                             style: GoogleFonts
                                                 .montserratAlternates(
                                               color: Colors.black87,
-                                              fontSize: 17,
+                                              fontSize: text * 14,
                                             ),
                                           ),
                                           Text(
@@ -193,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             style: GoogleFonts
                                                 .montserratAlternates(
                                               color: Colors.black87,
-                                              fontSize: 17,
+                                              fontSize: text * 14,
                                             ),
                                           ),
                                           Text(
@@ -201,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             style: GoogleFonts
                                                 .montserratAlternates(
                                               color: Colors.black87,
-                                              fontSize: 17,
+                                              fontSize: text * 14,
                                             ),
                                           ),
                                         ],
@@ -227,11 +254,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           children: [
                             SizedBox(
-                              height: 20,
+                              height: mheight / 35,
                             ),
                             Container(
                                 margin: EdgeInsets.only(
-                                  top: 200,
+                                  top: mheight / 3.7,
                                 ),
                                 child: Text(
                                   "Latest Profiles",
@@ -246,17 +273,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   );
                 }
-                return CircularProgressIndicator();
+                return CircularProgressIndicator(
+                  color: Colors.black,
+                );
               }),
           SizedBox(
-            height: 10,
+            height: mheight / 35,
           ),
           Row(
             children: [
-              SizedBox(height: 20),
+              SizedBox(height: mheight / 35),
               Expanded(
                 child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.44,
+                    height: mheight / 2.5,
                     child: StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('users')
@@ -270,6 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               email.add(element['email']);
                               age.add(element['age']);
                               city.add(element['city']);
+                              listUserMap.add(element.data());
                               country.add(element['country']);
                               height.add(element['height']);
                               gender.add(element['gender']);
@@ -283,12 +313,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 itemBuilder: (context, index) {
                                   return Column(children: [
                                     Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.75,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.20,
+                                        width: width / 1.3,
+                                        height: mheight / 4.5,
                                         decoration: BoxDecoration(
                                             border: Border.all(
                                                 width: 2.5,
@@ -308,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
                                           children: [
-                                            SizedBox(height: 10),
+                                            SizedBox(height: mheight / 45),
                                             Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
@@ -318,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   style: GoogleFonts
                                                       .montserratAlternates(
                                                           color: Colors.black87,
-                                                          fontSize: 17,
+                                                          fontSize: text * 14,
                                                           fontWeight:
                                                               FontWeight.w600),
                                                 ),
@@ -327,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   style: GoogleFonts
                                                       .montserratAlternates(
                                                           color: Colors.black87,
-                                                          fontSize: 17,
+                                                          fontSize: text * 14,
                                                           fontWeight:
                                                               FontWeight.w600),
                                                 )
@@ -338,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   MainAxisAlignment.spaceAround,
                                               children: [
                                                 SizedBox(
-                                                  height: 90,
+                                                  height: mheight / 40,
                                                 ),
                                                 Column(
                                                   children: [
@@ -347,7 +373,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       style: GoogleFonts
                                                           .montserratAlternates(
                                                         color: Colors.black87,
-                                                        fontSize: 14,
+                                                        fontSize: text * 12,
                                                       ),
                                                     ),
                                                     Text(
@@ -355,7 +381,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       style: GoogleFonts
                                                           .montserratAlternates(
                                                         color: Colors.black87,
-                                                        fontSize: 14,
+                                                        fontSize: text * 12,
                                                       ),
                                                     ),
                                                     Text(
@@ -363,7 +389,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       style: GoogleFonts
                                                           .montserratAlternates(
                                                         color: Colors.black87,
-                                                        fontSize: 14,
+                                                        fontSize: text * 12,
                                                       ),
                                                     )
                                                   ],
@@ -374,11 +400,40 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             .spaceBetween,
                                                     children: [
                                                       InkWell(
+                                                        onTap: () async {
+                                                          setState(() {
+                                                            userMap =
+                                                                listUserMap[
+                                                                    index];
+                                                          });
+                                                          print(userMap![
+                                                              'email']);
+                                                          String roomId =
+                                                              chatRoomId(
+                                                                  _auth
+                                                                      .currentUser!
+                                                                      .email!,
+                                                                  email[index]);
+                                                          chatSaved.add(
+                                                              userMap![
+                                                                  'email']);
+                                                          await SYC.addtochat(
+                                                              chatSaved, user!);
+                                                          Navigator.pushAndRemoveUntil(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder: (context) => ChatScreen(
+                                                                      userMap:
+                                                                          userMap!,
+                                                                      chatRoomId:
+                                                                          roomId)),
+                                                              (route) => false);
+                                                        },
                                                         child: Container(
                                                           alignment:
                                                               Alignment.center,
-                                                          height: 30,
-                                                          width: 60,
+                                                          height: mheight / 28,
+                                                          width: width / 7.5,
                                                           decoration: BoxDecoration(
                                                               borderRadius:
                                                                   BorderRadius
@@ -391,16 +446,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   .montserratAlternates(
                                                                 color: Colors
                                                                     .white,
-                                                                fontSize: 13,
+                                                                fontSize:
+                                                                    text * 10,
                                                               )),
                                                         ),
                                                       ),
-                                                      SizedBox(height: 10),
+                                                      SizedBox(
+                                                          height: mheight / 60),
                                                       InkWell(
                                                         onTap: () {
                                                           if (favouritelist
                                                               .contains(email[
                                                                   index])) {
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                                    SnackBar(
+                                                              content: Text(
+                                                                  "Already added in Favourites"),
+                                                              backgroundColor:
+                                                                  Colors.red,
+                                                            ));
                                                           } else {
                                                             favouritelist.add(
                                                                 email[index]);
@@ -420,8 +486,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         child: Container(
                                                           alignment:
                                                               Alignment.center,
-                                                          height: 30,
-                                                          width: 80,
+                                                          height: mheight / 28,
+                                                          width: width / 6,
                                                           decoration: BoxDecoration(
                                                               borderRadius:
                                                                   BorderRadius
@@ -435,12 +501,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 .montserratAlternates(
                                                               color:
                                                                   Colors.white,
-                                                              fontSize: 11,
+                                                              fontSize:
+                                                                  text * 9,
                                                             ),
                                                           ),
                                                         ),
                                                       ),
-                                                      SizedBox(height: 10),
+                                                      SizedBox(
+                                                          height: mheight / 60),
                                                       InkWell(
                                                         onTap: () {
                                                           Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -466,8 +534,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         child: Container(
                                                           alignment:
                                                               Alignment.center,
-                                                          height: 30,
-                                                          width: 60,
+                                                          height: mheight / 28,
+                                                          width: width / 7.5,
                                                           decoration: BoxDecoration(
                                                               borderRadius:
                                                                   BorderRadius
@@ -481,7 +549,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 .montserratAlternates(
                                                               color:
                                                                   Colors.white,
-                                                              fontSize: 13,
+                                                              fontSize:
+                                                                  text * 10,
                                                             ),
                                                           ),
                                                         ),
@@ -492,7 +561,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ],
                                         )),
                                     SizedBox(
-                                      height: 20,
+                                      height: mheight / 35,
                                     ),
                                   ]);
                                 });
@@ -508,50 +577,52 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Center(
             child: Center(
-              child: Container(
-                margin: EdgeInsets.only(top: 35),
-                child: SizedBox(
-                    width: 200,
-                    height: 50,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                Colors.black,
-                                Colors.grey,
-                                Colors.black
-                              ])),
-                      child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => FindYourMatch(
-                                          agee: age,
-                                          genderr: gender,
-                                          emaill: email,
-                                          statuss: status,
-                                          heightt: height,
-                                          religiouss: religious,
-                                          cityy: city,
-                                        )),
-                                (route) => false);
-                          },
-                          child: Text(
-                            "Find Your Match",
-                            style: GoogleFonts.montserratAlternates(
-                              fontSize: 17,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Container(
+                  child: SizedBox(
+                      width: width / 2.5,
+                      height: mheight / 15,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Colors.black,
+                                  Colors.grey,
+                                  Colors.black
+                                ])),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => FindYourMatch(
+                                            agee: age,
+                                            genderr: gender,
+                                            emaill: email,
+                                            statuss: status,
+                                            heightt: height,
+                                            religiouss: religious,
+                                            cityy: city,
+                                          )),
+                                  (route) => false);
+                            },
+                            child: Text(
+                              "Find Your Match",
+                              style: GoogleFonts.montserratAlternates(
+                                fontSize: text * 13,
+                              ),
                             ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                              elevation: 10,
-                              primary: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30)))),
-                    )),
+                            style: ElevatedButton.styleFrom(
+                                elevation: 10,
+                                primary: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30)))),
+                      )),
+                ),
               ),
             ),
           ),

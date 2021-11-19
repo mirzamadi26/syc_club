@@ -7,7 +7,6 @@ import 'package:project/authentication/auth_home.dart';
 import 'package:project/authentication/forgetpassword.dart';
 import 'package:project/authentication/signup.dart';
 import 'package:project/database/authservice.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -31,6 +30,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double text = MediaQuery.textScaleFactorOf(context);
     return Scaffold(
       body: isLoading
           ? Center(
@@ -42,15 +45,15 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: BoxDecoration(color: Colors.black),
               child: Column(
                 children: [
-                  SizedBox(height: 40),
+                  SizedBox(height: height / 20),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
                         Container(
                           alignment: Alignment.center,
-                          height: 30,
-                          width: 80,
+                          height: height / 25,
+                          width: width / 6,
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(30),
                               color: Colors.white),
@@ -68,14 +71,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             label: Text("Back",
                                 style: GoogleFonts.montserratAlternates(
-                                    fontSize: 13, color: Colors.black)),
+                                    fontSize: text * 9, color: Colors.black)),
                           ),
                         )
                       ],
                     ),
                   ),
                   SizedBox(
-                    height: 90,
+                    height: height / 7.5,
                   ),
                   Expanded(
                       child: Container(
@@ -96,20 +99,20 @@ class _LoginScreenState extends State<LoginScreen> {
                               EdgeInsets.only(left: 25, bottom: 22, top: 22),
                           child: Text("Login",
                               style: GoogleFonts.montserratAlternates(
-                                  fontSize: 20, color: Colors.black)),
+                                  fontSize: text * 15, color: Colors.black)),
                         ),
                         SizedBox(
-                          height: 30,
+                          height: height / 25,
                         ),
                         SingleChildScrollView(
                           child: Container(
-                            width: 320,
+                            width: width / 1.7,
                             child: Column(
                               children: [
                                 Text("Add your details to login",
                                     style: GoogleFonts.montserratAlternates(
                                         color: Colors.black54)),
-                                SizedBox(height: 20),
+                                SizedBox(height: height / 35),
                                 TextField(
                                   controller: emailController,
                                   style: TextStyle(color: Colors.black),
@@ -135,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             BorderSide(color: Colors.black)),
                                   ),
                                 ),
-                                SizedBox(height: 20),
+                                SizedBox(height: height / 40),
                                 TextField(
                                   controller: passwordController,
                                   obscureText: !passwordVisible,
@@ -174,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             BorderSide(color: Colors.black)),
                                   ),
                                 ),
-                                SizedBox(height: 10),
+                                SizedBox(height: height / 80),
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
@@ -194,11 +197,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                       )
                                     ]),
                                 SizedBox(
-                                  height: 30,
+                                  height: height / 30,
                                 ),
                                 SizedBox(
-                                    width: 280,
-                                    height: 50,
+                                    width: width / 1.7,
+                                    height: height / 15,
                                     child: DecoratedBox(
                                       decoration: BoxDecoration(
                                           borderRadius:
@@ -232,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               });
                                             }
 
-                                            dynamic result = await AuthService()
+                                            var result = await AuthService()
                                                 .login(emailController.text,
                                                     passwordController.text);
 
@@ -253,12 +256,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       builder: (context) =>
                                                           HomeScreen()),
                                                   (route) => false);
+                                            } else {
+                                              setState(() {
+                                                isLoading = false;
+                                              });
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(SnackBar(
+                                                content: Text(
+                                                    "Email or password is incorrect"),
+                                                backgroundColor: Colors.red,
+                                              ));
                                             }
                                           },
                                           child: Text("LOGIN",
                                               style: GoogleFonts
                                                   .montserratAlternates(
-                                                      fontSize: 16)),
+                                                      fontSize: text * 15)),
                                           style: ElevatedButton.styleFrom(
                                               elevation: 10,
                                               primary: Colors.transparent,
@@ -267,16 +280,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       BorderRadius.circular(
                                                           30)))),
                                     )),
-                                SizedBox(
-                                  height: 30,
-                                ),
+                                SizedBox(height: height / 35),
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text("Don't have an account?",
                                           style:
                                               GoogleFonts.montserratAlternates(
-                                                  fontSize: 13,
+                                                  fontSize: text * 12,
                                                   color: Colors.black)),
                                       TextButton(
                                         onPressed: () {

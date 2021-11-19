@@ -21,21 +21,25 @@ class _ForgetPassowrdState extends State<ForgetPassowrd> {
   TextEditingController emailController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double text = MediaQuery.textScaleFactorOf(context);
     return Scaffold(
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(color: Colors.black),
         child: Column(
           children: [
-            SizedBox(height: 40),
+            SizedBox(height: height / 20),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
                   Container(
                     alignment: Alignment.center,
-                    height: 30,
-                    width: 80,
+                    height: height / 25,
+                    width: width / 6,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
                         color: Colors.white),
@@ -54,14 +58,14 @@ class _ForgetPassowrdState extends State<ForgetPassowrd> {
                         label: Text(
                           "Back",
                           style: GoogleFonts.montserratAlternates(
-                              color: Colors.black, fontSize: 13),
+                              color: Colors.black, fontSize: text * 9),
                         )),
                   )
                 ],
               ),
             ),
             SizedBox(
-              height: 90,
+              height: height / 7.5,
             ),
             Expanded(
                 child: Container(
@@ -81,10 +85,10 @@ class _ForgetPassowrdState extends State<ForgetPassowrd> {
                     margin: EdgeInsets.only(left: 25, bottom: 22, top: 22),
                     child: Text("Forget Password",
                         style: GoogleFonts.montserratAlternates(
-                            color: Colors.black, fontSize: 20)),
+                            color: Colors.black, fontSize: text * 16)),
                   ),
                   SizedBox(
-                    height: 100,
+                    height: height / 25,
                   ),
                   SingleChildScrollView(
                     child: Container(
@@ -93,7 +97,7 @@ class _ForgetPassowrdState extends State<ForgetPassowrd> {
                           Text("Add your details to Reset Password",
                               style: GoogleFonts.montserratAlternates(
                                   color: Colors.black54)),
-                          SizedBox(height: 20),
+                          SizedBox(height: height / 35),
                           TextField(
                             controller: emailController,
                             style: TextStyle(color: Colors.black),
@@ -116,13 +120,12 @@ class _ForgetPassowrdState extends State<ForgetPassowrd> {
                                   borderSide: BorderSide(color: Colors.black)),
                             ),
                           ),
-                          SizedBox(height: 20),
                           SizedBox(
-                            height: 30,
+                            height: height / 15,
                           ),
                           SizedBox(
-                              width: 280,
-                              height: 50,
+                              width: width / 1.7,
+                              height: height / 15,
                               child: DecoratedBox(
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(30),
@@ -138,10 +141,16 @@ class _ForgetPassowrdState extends State<ForgetPassowrd> {
                                     onPressed: () async {
                                       await auth.sendPasswordResetEmail(
                                           email: emailController.text);
+                                      emailController.clear();
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  LoginScreen()));
                                     },
                                     child: Text("Reset Password",
                                         style: GoogleFonts.montserratAlternates(
-                                            fontSize: 16)),
+                                            fontSize: text * 15)),
                                     style: ElevatedButton.styleFrom(
                                         elevation: 10,
                                         primary: Colors.transparent,
@@ -149,7 +158,7 @@ class _ForgetPassowrdState extends State<ForgetPassowrd> {
                                             borderRadius:
                                                 BorderRadius.circular(30)))),
                               )),
-                          SizedBox(height: 60),
+                          SizedBox(height: height / 20),
                           Text(
                               "You will recieve an email from where you can change password.",
                               textAlign: TextAlign.center,

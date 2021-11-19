@@ -4,23 +4,43 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project/Home/drawernavigation.dart';
 import 'package:project/Home/homescreen.dart';
+import 'package:project/chat/chat.dart';
+import 'package:project/chat/chatScreen.dart';
 import 'package:project/database/databasemanager.dart';
 
-// ignore: must_be_immutable
-class Favourite extends StatefulWidget {
-  Favourite({
-    Key? key,
-  }) : super(key: key);
+class RecentChat extends StatefulWidget {
+  RecentChat({Key? key}) : super(key: key);
+
   @override
-  _FavouriteState createState() => _FavouriteState();
+  _RecentChatState createState() => _RecentChatState();
 }
 
-class _FavouriteState extends State<Favourite> {
+class _RecentChatState extends State<RecentChat> {
   String? user;
+  FirebaseAuth _auth = FirebaseAuth.instance;
   List<dynamic> syc = [];
-  List favNames = [];
-  List savefav = [];
-  List favEmails = [];
+  List chatNames = [];
+  List savechat = [];
+  List chatSaved = [];
+  List chatEmails = [];
+  Map<String, dynamic>? userMap;
+  String chatRoomId(String user1, String user2) {
+    if (user1[0].toLowerCase().codeUnits[0] >
+        user2.toLowerCase().codeUnits[0]) {
+      return "$user1$user2";
+    } else {
+      return "$user2$user1";
+    }
+  }
+
+  getChat() async {
+    final result = await SYC.getchatemails(user!);
+    setState(() {
+      chatSaved = result;
+    });
+  }
+
+  List listUserMap = [];
 
   getEmail() {
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -30,17 +50,17 @@ class _FavouriteState extends State<Favourite> {
   }
 
   getemails() async {
-    final result = await SYC.getfavemails(user!);
+    final result = await SYC.getchatemails(user!);
     setState(() {
-      favEmails = result;
+      chatEmails = result;
     });
-    print(favEmails.length);
+    print(chatEmails.length);
   }
 
-  getfavEmail() async {
-    final result = await SYC.getfavName(user!);
+  getchatEmail() async {
+    final result = await SYC.getchatName(user!);
     setState(() {
-      favNames = result;
+      chatNames = result;
     });
   }
 
@@ -48,8 +68,9 @@ class _FavouriteState extends State<Favourite> {
   void initState() {
     super.initState();
     getEmail();
-    getfavEmail();
+    getChat();
     getemails();
+    getchatEmail();
   }
 
   @override
@@ -62,37 +83,25 @@ class _FavouriteState extends State<Favourite> {
         appBar: AppBar(
           iconTheme: IconThemeData(color: Colors.black),
           backgroundColor: Colors.white,
-          title: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('users').snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  snapshot.data!.docs.forEach((element) {
-                    if (element['email'] == user) {
-                      syc.add(element.data());
-                    }
-                  });
-                  return Text("Hi, ${syc[0]['firstname']}",
-                      style: GoogleFonts.montserratAlternates(
-                          color: Colors.black87, fontSize: 16));
-                }
-                return CircularProgressIndicator(
-                  color: Colors.black,
-                );
-              }),
+          title: Text(
+            "Chats",
+            style: TextStyle(color: Colors.black),
+          ),
           actions: [
             TextButton.icon(
                 onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => HomeScreen()));
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => Chat()),
+                      (route) => false);
                 },
                 icon: Icon(
-                  Icons.arrow_back,
+                  Icons.search,
                   color: Colors.black,
                   size: 18,
                 ),
                 label: Text(
-                  "Back",
+                  "Search",
                   style: GoogleFonts.montserratAlternates(
                     color: Colors.black,
                     fontSize: 13,
@@ -111,7 +120,7 @@ class _FavouriteState extends State<Favourite> {
                   height: height / 7,
                   decoration: BoxDecoration(color: Colors.white),
                   child: Text(
-                    "Favourite",
+                    "Chats",
                     style: GoogleFonts.montserratAlternates(
                       color: Colors.black,
                       fontWeight: FontWeight.w600,
@@ -127,7 +136,7 @@ class _FavouriteState extends State<Favourite> {
                   child: SizedBox(
                 height: height,
                 child: ListView.builder(
-                    itemCount: favNames.length,
+                    itemCount: chatNames.length,
                     itemBuilder: (context, index) {
                       return Column(children: [
                         Container(
@@ -154,16 +163,20 @@ class _FavouriteState extends State<Favourite> {
                                       horizontal: 10.0),
                                   child: Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceAround,
                                     children: [
-                                      Icon(
-                                        Icons.star,
-                                        size: 36,
+                                      CircleAvatar(
+                                        radius: width / 21,
+                                        backgroundColor: Colors.white,
+                                        backgroundImage:
+                                            AssetImage("assets/profile.png"),
                                       ),
                                       Container(
-                                          margin: EdgeInsets.only(left: 90),
+                                          margin:
+                                              EdgeInsets.only(left: width / 15),
                                           child: Text(
-                                            favNames[index],
+                                            "${chatNames[index]['firstname']} ${chatNames[index]['lastname']}",
+                                            // chatNames[index]['firstname'],
                                             style: GoogleFonts
                                                 .montserratAlternates(
                                               color: Colors.black,
@@ -172,18 +185,25 @@ class _FavouriteState extends State<Favourite> {
                                           )),
                                       IconButton(
                                           onPressed: () async {
-                                            favEmails.remove(favEmails[index]);
-                                            await SYC.addtofav(
-                                                favEmails, user!);
-                                            print(favEmails);
+                                            setState(() {
+                                              userMap = chatNames[index];
+                                            });
+                                            String roomId = chatRoomId(
+                                                _auth.currentUser!.email!,
+                                                userMap!['email']);
+                                            print(userMap![index]);
+
                                             Navigator.pushAndRemoveUntil(
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        Favourite()),
+                                                        ChatScreen(
+                                                            userMap: userMap!,
+                                                            chatRoomId:
+                                                                roomId)),
                                                 (route) => false);
                                           },
-                                          icon: Icon(Icons.remove))
+                                          icon: Icon(Icons.chat))
                                     ],
                                   ),
                                 )

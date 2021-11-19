@@ -9,28 +9,34 @@ class AuthHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double text = MediaQuery.textScaleFactorOf(context);
+
+    print(size);
     return Scaffold(
         body: Container(
             alignment: Alignment.center,
             child: SingleChildScrollView(
               child:
                   Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-                SizedBox(height: 20),
+                SizedBox(height: height / 40),
                 Image.asset(
                   'assets/logo.png',
-                  width: 150,
+                  width: width / 3.4,
                 ),
                 SizedBox(height: 20),
                 Text("Syrian Youth Club",
                     style: GoogleFonts.montserratAlternates(
-                      fontSize: 20,
+                      fontSize: text * 17,
                     )),
                 SizedBox(
-                  height: 250,
+                  height: height / 3,
                 ),
                 SizedBox(
-                    width: 280,
-                    height: 50,
+                    width: width / 1.7,
+                    height: height / 15,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(30),
@@ -52,7 +58,7 @@ class AuthHome extends StatelessWidget {
                           },
                           child: Text("LOGIN",
                               style: GoogleFonts.montserratAlternates(
-                                fontSize: 16,
+                                fontSize: text * 15,
                               )),
                           style: ElevatedButton.styleFrom(
                               elevation: 10,
@@ -62,8 +68,8 @@ class AuthHome extends StatelessWidget {
                     )),
                 SizedBox(height: 20),
                 SizedBox(
-                  height: 50,
-                  width: 280,
+                  height: height / 15,
+                  width: width / 1.7,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: Colors.transparent,
@@ -79,7 +85,7 @@ class AuthHome extends StatelessWidget {
                         },
                         child: Text("Create an Account",
                             style: GoogleFonts.montserratAlternates(
-                                fontSize: 16, color: Colors.black54)),
+                                fontSize: text * 15, color: Colors.black54)),
                         style: ElevatedButton.styleFrom(
                             primary: Colors.white,
                             shape: RoundedRectangleBorder(

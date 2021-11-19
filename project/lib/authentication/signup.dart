@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project/Home/homescreen.dart';
@@ -5,7 +6,6 @@ import 'package:project/Home/registrationform.dart';
 import 'package:project/authentication/auth_home.dart';
 import 'package:project/authentication/login.dart';
 import 'package:project/database/authservice.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpScren extends StatefulWidget {
   SignUpScren({Key? key}) : super(key: key);
@@ -30,6 +30,10 @@ class _SignUpScrenState extends State<SignUpScren> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double text = MediaQuery.textScaleFactorOf(context);
     return Scaffold(
       body: isLoading
           ? Center(
@@ -41,15 +45,15 @@ class _SignUpScrenState extends State<SignUpScren> {
               decoration: BoxDecoration(color: Colors.black),
               child: Column(
                 children: [
-                  SizedBox(height: 40),
+                  SizedBox(height: height / 20),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
                         Container(
                           alignment: Alignment.center,
-                          height: 30,
-                          width: 80,
+                          height: height / 25,
+                          width: width / 6,
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(30),
                               color: Colors.white),
@@ -67,18 +71,18 @@ class _SignUpScrenState extends State<SignUpScren> {
                             ),
                             label: Text("Back",
                                 style: GoogleFonts.montserratAlternates(
-                                    fontSize: 12, color: Colors.black)),
+                                    fontSize: text * 9, color: Colors.black)),
                           ),
                         )
                       ],
                     ),
                   ),
                   SizedBox(
-                    height: 90,
+                    height: height / 7.5,
                   ),
                   Expanded(
                       child: Container(
-                    height: 400,
+                    height: MediaQuery.of(context).size.height * 0.75,
                     width: double.infinity,
                     decoration: BoxDecoration(
                         color: Colors.white,
@@ -95,196 +99,142 @@ class _SignUpScrenState extends State<SignUpScren> {
                               EdgeInsets.only(left: 25, bottom: 22, top: 22),
                           child: Text("Sign Up",
                               style: GoogleFonts.montserratAlternates(
-                                  fontSize: 20, color: Colors.black)),
+                                  fontSize: text * 15, color: Colors.black)),
                         ),
                         SizedBox(
-                          height: 30,
+                          height: height / 25,
                         ),
-                        SingleChildScrollView(
-                          child: Container(
-                            width: 320,
-                            child: Column(
-                              children: [
-                                Text("Add your details to Sign Up",
-                                    style: GoogleFonts.montserratAlternates(
-                                        color: Colors.black54)),
-                                SizedBox(height: 20),
-                                TextField(
-                                  controller: nameController,
-                                  style: TextStyle(color: Colors.black),
-                                  cursorColor: Colors.black,
-                                  decoration: InputDecoration(
-                                    suffixIcon: Icon(Icons.account_box_outlined,
-                                        color: Colors.black, size: 26),
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                        borderSide:
-                                            BorderSide(color: Colors.black)),
-                                    hintText: "Your Name",
-                                    hintStyle: GoogleFonts.montserratAlternates(
-                                        color: Colors.black),
-                                    border: OutlineInputBorder(
+                        Container(
+                          width: width / 1.7,
+                          child: Column(
+                            children: [
+                              Text("Add your details to Sign Up",
+                                  style: GoogleFonts.montserratAlternates(
+                                      color: Colors.black54)),
+                              SizedBox(height: height / 30),
+                              TextField(
+                                controller: emailController,
+                                style: TextStyle(color: Colors.black),
+                                cursorColor: Colors.black,
+                                decoration: InputDecoration(
+                                  suffixIcon: Icon(Icons.email,
+                                      color: Colors.black, size: 26),
+                                  enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(30),
                                       borderSide:
-                                          BorderSide(color: Colors.black),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                        borderSide:
-                                            BorderSide(color: Colors.black)),
+                                          BorderSide(color: Colors.black)),
+                                  hintText: "Your Email",
+                                  hintStyle: GoogleFonts.montserratAlternates(
+                                      color: Colors.black),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: BorderSide(color: Colors.black),
                                   ),
-                                ),
-                                SizedBox(height: 20),
-                                TextField(
-                                  controller: emailController,
-                                  style: TextStyle(color: Colors.black),
-                                  cursorColor: Colors.black,
-                                  decoration: InputDecoration(
-                                    suffixIcon: Icon(Icons.email,
-                                        color: Colors.black, size: 26),
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                        borderSide:
-                                            BorderSide(color: Colors.black)),
-                                    hintText: "Your Email",
-                                    hintStyle: GoogleFonts.montserratAlternates(
-                                        color: Colors.black),
-                                    border: OutlineInputBorder(
+                                  focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(30),
                                       borderSide:
-                                          BorderSide(color: Colors.black),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                        borderSide:
-                                            BorderSide(color: Colors.black)),
-                                  ),
+                                          BorderSide(color: Colors.black)),
                                 ),
-                                SizedBox(height: 20),
-                                TextField(
-                                  controller: passwordController,
-                                  style: TextStyle(color: Colors.black),
-                                  cursorColor: Colors.black,
-                                  obscureText: !passwordVisible,
-                                  decoration: InputDecoration(
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        passwordVisible
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                        color: Colors.black,
-                                        size: 26,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          passwordVisible = !passwordVisible;
-                                        });
+                              ),
+                              SizedBox(height: height / 35),
+                              TextField(
+                                controller: passwordController,
+                                style: TextStyle(color: Colors.black),
+                                cursorColor: Colors.black,
+                                obscureText: !passwordVisible,
+                                decoration: InputDecoration(
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      passwordVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Colors.black,
+                                      size: 26,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        passwordVisible = !passwordVisible;
+                                      });
+                                    },
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      borderSide:
+                                          BorderSide(color: Colors.black)),
+                                  hintText: "Password (Min 6)",
+                                  hintStyle: GoogleFonts.montserratAlternates(
+                                      color: Colors.black),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: BorderSide(color: Colors.black),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      borderSide:
+                                          BorderSide(color: Colors.black)),
+                                ),
+                              ),
+                              SizedBox(
+                                height: height / 30,
+                              ),
+                              SizedBox(
+                                width: width / 1.7,
+                                height: height / 15,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      gradient: LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Colors.black,
+                                            Colors.grey,
+                                            Colors.black
+                                          ])),
+                                  child: ElevatedButton(
+                                      onPressed: () async {
+                                        if (emailController.text.isEmpty ||
+                                            passwordController.text.isEmpty) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text("Fields are Empty"),
+                                            backgroundColor: Colors.red,
+                                          ));
+                                        }
+                                        if (passwordController
+                                                .text.isNotEmpty &&
+                                            emailController.text.isNotEmpty &&
+                                            passwordController.text.length >
+                                                5) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RegistrationForm(
+                                                        email: emailController
+                                                            .text,
+                                                        password:
+                                                            passwordController
+                                                                .text)),
+                                          );
+                                        }
                                       },
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                        borderSide:
-                                            BorderSide(color: Colors.black)),
-                                    hintText: "Password",
-                                    hintStyle: GoogleFonts.montserratAlternates(
-                                        color: Colors.black),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                      borderSide:
-                                          BorderSide(color: Colors.black),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                        borderSide:
-                                            BorderSide(color: Colors.black)),
-                                  ),
+                                      child: Text("Sign Up",
+                                          style:
+                                              GoogleFonts.montserratAlternates(
+                                                  fontSize: text * 15,
+                                                  color: Colors.white)),
+                                      style: ElevatedButton.styleFrom(
+                                          elevation: 10,
+                                          primary: Colors.transparent,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30)))),
                                 ),
-                                SizedBox(height: 10),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                                SizedBox(
-                                  width: 280,
-                                  height: 50,
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        gradient: LinearGradient(
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                            colors: [
-                                              Colors.black,
-                                              Colors.grey,
-                                              Colors.black
-                                            ])),
-                                    child: ElevatedButton(
-                                        onPressed: () async {
-                                          if (nameController.text.isEmpty ||
-                                              emailController.text.isEmpty ||
-                                              passwordController.text.isEmpty) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                              content: Text("Fields are Empty"),
-                                              backgroundColor: Colors.red,
-                                            ));
-                                          }
-                                          if (nameController.text.isNotEmpty &&
-                                              passwordController
-                                                  .text.isNotEmpty &&
-                                              emailController.text.isNotEmpty) {
-                                            setState(() {
-                                              isLoading = true;
-                                            });
-                                          }
-                                          dynamic result = await AuthService()
-                                              .register(
-                                                  nameController.text,
-                                                  emailController.text,
-                                                  passwordController.text);
-                                          if (result != null) {
-                                            setState(() {
-                                              isLoading = false;
-                                            });
-                                            Navigator.pushAndRemoveUntil(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        RegistrationForm(
-                                                          email: emailController
-                                                              .text,
-                                                        )),
-                                                (route) => false);
-                                          }
-
-                                          // if (result == null ||
-                                          //     result == "" ||
-                                          //     emailController.text.isEmpty ||
-                                          //     passwordController.text.isEmpty) {
-                                          //   ScaffoldMessenger.of(context)
-                                          //       .showSnackBar(SnackBar(
-                                          //           content: Text(
-                                          //               "Email or password field is empty"),
-                                          //           backgroundColor: Colors.red));
-                                          // } else if (result != null) {}
-                                        },
-                                        child: Text("Sign Up",
-                                            style: GoogleFonts
-                                                .montserratAlternates(
-                                                    fontSize: 18,
-                                                    color: Colors.white)),
-                                        style: ElevatedButton.styleFrom(
-                                            elevation: 10,
-                                            primary: Colors.transparent,
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        30)))),
-                                  ),
-                                )
-                              ],
-                            ),
+                              )
+                            ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ))

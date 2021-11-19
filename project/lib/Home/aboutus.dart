@@ -31,6 +31,10 @@ class _AboutUsState extends State<AboutUs> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double text = MediaQuery.textScaleFactorOf(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -77,7 +81,7 @@ class _AboutUsState extends State<AboutUs> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(
-              height: 70,
+              height: height / 20,
             ),
             Padding(
               padding: const EdgeInsets.all(18.0),
@@ -87,7 +91,7 @@ class _AboutUsState extends State<AboutUs> {
                     "About Us",
                     style: GoogleFonts.montserratAlternates(
                       color: Colors.black,
-                      fontSize: 22,
+                      fontSize: text * 18,
                       fontWeight: FontWeight.w600,
                     ),
                   )),
@@ -100,7 +104,7 @@ class _AboutUsState extends State<AboutUs> {
                     "What exactly is SYC?",
                     style: GoogleFonts.montserratAlternates(
                       color: Colors.black,
-                      fontSize: 20,
+                      fontSize: text * 17,
                     ),
                   )),
             ),
@@ -112,7 +116,7 @@ class _AboutUsState extends State<AboutUs> {
                   "SYC is syrian Social Club. We are a group of matchmakers that to help singles meet naturally and organically in a fun, un-intimidating setting. Our objective is for singles to get together more often without having to be set up on blind dates, which is not everyone's cup of tea. Our events are geard towards singles of all different ages and all different religious levels. We want to reach everyone, or as many people as we possibly can",
                   style: GoogleFonts.montserratAlternates(
                     color: Colors.black,
-                    fontSize: 18,
+                    fontSize: text * 16,
                   ),
                 ),
               ),

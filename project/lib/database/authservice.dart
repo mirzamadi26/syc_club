@@ -11,16 +11,20 @@ class AuthService {
   //Register User
 
   Future<User?> register(
-    String name,
     String email,
     String password,
   ) async {
     try {
       UserCredential userCredential = await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
-      userCredential.user!.updateDisplayName(name);
+
       final user = userCredential.user;
       return user;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        User? emailVerify;
+        return emailVerify;
+      }
     } catch (e) {
       print(e);
     }
@@ -45,5 +49,19 @@ class AuthService {
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<bool> checkEmail(String email) async {
+    var result = FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .get();
+    result.then((value) {
+      if (value.docs.length != 0) {
+        return false;
+      } else
+        return true;
+    });
+    return false;
   }
 }

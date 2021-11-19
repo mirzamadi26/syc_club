@@ -3,14 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project/Home/aboutus.dart';
-import 'package:project/Home/chat.dart';
+import 'package:project/chat/chat.dart';
 
 import 'package:project/Home/favourite.dart';
 import 'package:project/Home/homescreen.dart';
 import 'package:project/Home/myprofile.dart';
 import 'package:project/Home/registrationform.dart';
 import 'package:project/authentication/auth_home.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:project/chat/recentchat.dart';
+import 'package:project/database/authservice.dart';
 
 class DrawerNavigation extends StatefulWidget {
   DrawerNavigation({Key? key}) : super(key: key);
@@ -38,6 +39,10 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double text = MediaQuery.textScaleFactorOf(context);
     return SingleChildScrollView(
       child: Container(
         height: MediaQuery.of(context).size.height * 1,
@@ -45,7 +50,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
           child: ListView(
             children: [
               SizedBox(
-                height: 20,
+                height: height / 35,
               ),
               Row(children: [
                 TextButton.icon(
@@ -57,13 +62,13 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                       "Back",
                       style: GoogleFonts.montserratAlternates(
                         color: Colors.black,
-                        fontSize: 13,
+                        fontSize: text * 11,
                       ),
                     ))
               ]),
               Column(children: [
                 SizedBox(
-                  height: 20,
+                  height: height / 35,
                 ),
                 StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
@@ -78,8 +83,8 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                         });
                         return Container(
                             alignment: Alignment.center,
-                            height: 50,
-                            width: 250,
+                            height: height / 15,
+                            width: width / 2.1,
                             decoration: BoxDecoration(
                               color: Colors.black,
                             ),
@@ -90,14 +95,14 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                                   syc[0]['firstname'],
                                   style: GoogleFonts.montserratAlternates(
                                     color: Colors.white,
-                                    fontSize: 15,
+                                    fontSize: text * 13,
                                   ),
                                 ),
                                 Text(
                                   " ${syc[0]['lastname']}",
                                   style: GoogleFonts.montserratAlternates(
                                     color: Colors.white,
-                                    fontSize: 15,
+                                    fontSize: text * 13,
                                   ),
                                 ),
                               ],
@@ -105,7 +110,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                       }
                       return CircularProgressIndicator();
                     }),
-                SizedBox(height: 20),
+                SizedBox(height: height / 35),
                 ListTile(
                   onTap: () {
                     Navigator.of(context).push(
@@ -125,7 +130,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                   ),
                 ),
                 SizedBox(
-                  height: 20,
+                  height: height / 35,
                 ),
                 ListTile(
                   onTap: () {
@@ -146,12 +151,12 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                   ),
                 ),
                 SizedBox(
-                  height: 20,
+                  height: height / 35,
                 ),
                 ListTile(
                   onTap: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) => Chat()));
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => RecentChat()));
                   },
                   title: Text(
                     "Chat",
@@ -167,7 +172,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                   ),
                 ),
                 SizedBox(
-                  height: 20,
+                  height: height / 35,
                 ),
                 ListTile(
                   onTap: () {
@@ -188,7 +193,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                   ),
                 ),
                 SizedBox(
-                  height: 20,
+                  height: height / 35,
                 ),
                 ListTile(
                   onTap: () {
@@ -212,7 +217,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                   ),
                 ),
                 SizedBox(
-                  height: 200,
+                  height: height / 6.5,
                 ),
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -232,9 +237,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                           )),
                       TextButton.icon(
                           onPressed: () async {
-                            SharedPreferences sharedPreferences =
-                                await SharedPreferences.getInstance();
-                            sharedPreferences.remove('email');
+                            await AuthService().logOut();
                             Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
@@ -256,7 +259,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                     ]),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
-                  child: Divider(height: 5),
+                  child: Divider(height: height / 50),
                 ),
               ])
             ],

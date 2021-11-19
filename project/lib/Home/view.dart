@@ -43,6 +43,10 @@ class _ViewState extends State<View> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double text = MediaQuery.textScaleFactorOf(context);
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -91,29 +95,31 @@ class _ViewState extends State<View> {
         drawer: DrawerNavigation(),
         body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
           SizedBox(
-            height: 30,
+            height: height / 20,
           ),
           Text(
             "View",
             style: GoogleFonts.montserratAlternates(
-                color: Colors.black, fontSize: 20, fontWeight: FontWeight.w600),
+                color: Colors.black,
+                fontSize: text * 17,
+                fontWeight: FontWeight.w600),
           ),
           Stack(children: [
             Container(
               width: double.infinity,
-              height: 230,
+              height: height / 10,
               decoration: BoxDecoration(
                 color: Colors.white,
               ),
             ),
             SizedBox(
-              height: 20,
+              height: height / 10,
             ),
             Center(
               child: Container(
                 margin: EdgeInsets.only(top: 30),
-                width: MediaQuery.of(context).size.width * 0.75,
-                height: MediaQuery.of(context).size.height * 0.20,
+                width: width / 1.5,
+                height: height / 4.5,
                 decoration: BoxDecoration(
                     border: Border.all(width: 2.5, color: Colors.black),
                     borderRadius: BorderRadius.circular(40),
@@ -145,38 +151,38 @@ class _ViewState extends State<View> {
                                       widget.firstname,
                                       style: GoogleFonts.montserratAlternates(
                                         color: Colors.black,
-                                        fontSize: 15,
+                                        fontSize: text * 13,
                                       ),
                                     ),
                                     Text(
                                       " ${widget.lastname}",
                                       style: GoogleFonts.montserratAlternates(
                                         color: Colors.black,
-                                        fontSize: 15,
+                                        fontSize: text * 13,
                                       ),
                                     )
                                   ],
                                 ),
-                                SizedBox(height: 10),
+                                SizedBox(height: height / 35),
                                 Text(
                                   "${widget.age}, ${widget.city}, ${widget.country}",
                                   style: GoogleFonts.montserratAlternates(
                                     color: Colors.black,
-                                    fontSize: 15,
+                                    fontSize: text * 13,
                                   ),
                                 ),
                                 Text(
                                   widget.gender,
                                   style: GoogleFonts.montserratAlternates(
                                     color: Colors.black,
-                                    fontSize: 15,
+                                    fontSize: text * 13,
                                   ),
                                 ),
                                 Text(
                                   widget.status,
                                   style: GoogleFonts.montserratAlternates(
                                     color: Colors.black,
-                                    fontSize: 15,
+                                    fontSize: text * 13,
                                   ),
                                 ),
                               ],

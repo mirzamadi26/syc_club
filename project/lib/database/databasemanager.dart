@@ -16,21 +16,23 @@ class SYC {
 
 // Add data
   static Future adduser(
-      String firstname,
-      String lastname,
-      String mobileno,
-      String email,
-      String age,
-      String gender,
-      String religious,
-      String status,
-      String height,
-      String city,
-      String children,
-      String hobbies,
-      String income,
-      String country,
-      List fav) async {
+    String firstname,
+    String lastname,
+    String mobileno,
+    String email,
+    String age,
+    String gender,
+    String religious,
+    String status,
+    String height,
+    String city,
+    String children,
+    String hobbies,
+    String income,
+    String country,
+    List fav,
+    List chat,
+  ) async {
     final addnotes = FirebaseFirestore.instance.collection('users');
 
     await addnotes.doc(email).set({
@@ -49,6 +51,7 @@ class SYC {
       "income": income,
       "country": country,
       "fav": fav,
+      "chat": chat,
     });
   }
 
@@ -93,5 +96,47 @@ class SYC {
     }
 
     return matchData;
+  }
+
+  // static Future recentChat() async {
+  //   final recentChatt = FirebaseFirestore.instance.collection("chatroom");
+  //   await recentChatt.get().then((QuerySnapshot) {
+  //     QuerySnapshot.docs.forEach((element) {
+  //       print(element.id);
+  //     });
+  //     print("Hello");
+  //   });
+  // }
+
+  static Future addtochat(List chat, String email) async {
+    final chatsaved = FirebaseFirestore.instance.collection("users");
+    await chatsaved.doc(email).update({"chat": chat});
+  }
+
+  static Future getchatemails(String email) async {
+    final chatname = FirebaseFirestore.instance.collection("users");
+    final data = await chatname.doc(email).get();
+    final result = data.data();
+    List chatResult = result!['chat'];
+    print(chatResult);
+    return chatResult;
+  }
+
+  static Future getchatName(String email) async {
+    List nameResult = [];
+    final chatname = FirebaseFirestore.instance.collection("users");
+    final data = await chatname.doc(email).get();
+    final result = data.data();
+    //print(result['firstname']);
+    List favEmail = result!['chat'];
+    int i = 0;
+    for (i = 0; i < favEmail.length; i++) {
+      final emailData = await chatname.doc(favEmail[i]).get();
+      final result = emailData.data();
+      nameResult.add(result);
+      // nameResult.add(result!['firstname'] + ' ' + result['lastname']);
+    }
+    print(nameResult);
+    return nameResult;
   }
 }
